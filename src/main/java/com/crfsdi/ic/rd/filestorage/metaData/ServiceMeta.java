@@ -37,4 +37,13 @@ public class ServiceMeta implements DocUtil {
         this.profile = profile;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ServiceMeta{" +
+                "_id='" + _id + '\'' +
+                ", name='" + name + '\'' +
+                ", profile='" + profile + '\'' +
+                '}';
+    }
 }

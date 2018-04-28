@@ -48,4 +48,14 @@ public class ProjectMeta implements DocUtil {
         this.members = members;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectMeta{" +
+                "_id='" + _id + '\'' +
+                ", name='" + name + '\'' +
+                ", profile='" + profile + '\'' +
+                ", members=" + members +
+                '}';
+    }
 }

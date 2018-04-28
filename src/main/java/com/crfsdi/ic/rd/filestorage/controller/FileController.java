@@ -11,6 +11,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,8 @@ public class FileController {
 
     @GetMapping("/file")
     public List<? extends DocUtil> getAllFilesInfo() {
-        List<FileMeta> result = new ArrayList<>();
+        List<FileOutput> result = new ArrayList<>();
         MongoCollection<? extends Document> fileCollection = mongoClient.getDatabase(Util.DATABAST_NAME).getCollection(Util.COLLECTION_FILE_NAME);
-        FileMeta fileMeta = null;
         fileCollection.find().forEach((Block<Document>) fileDoc -> {
             FileOutput fileOutput = new FileOutput(DocUtil.getThis(fileDoc, FileMeta.class));
             if (fileOutput.getServiceId() != null && serviceMetaMap.containsKey(fileOutput.getServiceId())) {
@@ -150,8 +150,8 @@ public class FileController {
                 .find(Filters.eq(fileId)).first());
         documentOptional.ifPresent(
                 document -> {
-                    File file = new File(DocUtil.getThis(document,FileMeta.class).getPath());
-                    if (file.isFile() && file.exists()){
+                    File file = new File(DocUtil.getThis(document, FileMeta.class).getPath());
+                    if (file.isFile() && file.exists()) {
                         file.delete();
                     }
                 }
@@ -162,10 +162,41 @@ public class FileController {
     }
 
     @PostMapping("/searchfile")
-    public List<FileMeta> deleteFileById(FileMeta fileMeta) {
-        List<FileMeta> result = new LinkedList<>();
-        LOG.info(fileMeta.toString());;
-
+    public List<FileOutput> searchFile(@RequestParam(value = "name", required = false) String inputName
+            , @RequestParam(value = "serviceId", required = false) String inputServiceId
+            , @RequestParam(value = "projectId", required = false) String inputProjectId) {
+        List<FileOutput> result = new LinkedList<>();
+        Bson filters = null;
+        if (inputServiceId != null && inputProjectId != null) {
+            filters = Filters.and(Filters.eq("serviceId", inputServiceId)
+                    , Filters.eq("projectId", inputProjectId));
+        }
+        if (inputServiceId == null && inputProjectId != null) {
+            filters = Filters.eq("projectId", inputProjectId);
+        }
+        if (inputServiceId != null && inputProjectId == null) {
+            filters = Filters.eq("serviceId", inputServiceId);
+        }
+        mongoClient.getDatabase(Util.DATABAST_NAME)
+                .getCollection(Util.COLLECTION_FILE_NAME)
+                .find(filters)
+                .forEach((Block<? super Document>) doc -> {
+                    FileOutput temp = new FileOutput(DocUtil.getThis(doc,FileMeta.class));
+                    if (temp.getServiceId() != null && serviceMetaMap.containsKey(temp.getServiceId())) {
+                        temp.setServiceName(serviceMetaMap.get(temp.getServiceId()).getName());
+                    }
+                    if (temp.getProjectId() != null && projectMetaMap.containsKey(temp.getProjectId())) {
+                        temp.setProjectName(projectMetaMap.get(temp.getProjectId()).getName());
+                    }
+                    if (inputName != null){
+                        if (temp.getName().contains(inputName)){
+                            result.add(temp);
+                        }
+                    }else {
+                        result.add(temp);
+                    }
+                });
+        LOG.info(result.toString());
         return result;
     }
 

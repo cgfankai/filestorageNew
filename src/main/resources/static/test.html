@@ -62,6 +62,24 @@
         })
     </script>
 
+    <input type="button" value="搜索文件" id="searchfile"/>
+    <script>
+        $("#searchfile").on("click",function () {
+
+            $.ajax({
+                url:urlPrefix + "searchfile" ,
+                method:"post",
+                data:{
+                    _id:1111111
+                },
+                complete:function (data,status) {
+                    console.info("data",data)
+                    console.info("status",status)
+                }
+            })
+        })
+    </script>
+
 </div>
 </body>
 </html>
