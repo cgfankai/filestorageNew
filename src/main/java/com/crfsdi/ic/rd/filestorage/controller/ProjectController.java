@@ -2,7 +2,6 @@ package com.crfsdi.ic.rd.filestorage.controller;
 
 import com.crfsdi.ic.rd.filestorage.Data.Util;
 import com.crfsdi.ic.rd.filestorage.metaData.ProjectMeta;
-import com.crfsdi.ic.rd.filestorage.metaData.ServiceMeta;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
@@ -50,16 +49,16 @@ public class ProjectController {
 
     }
     @PostMapping ("/project/{id}")
-    public boolean updateProjectById(ProjectMeta projectMeta,@PathVariable("id") String serviceId){
-        projectMeta.set_id(serviceId);
+    public boolean updateProjectById(ProjectMeta projectMeta,@PathVariable("id") String projectId){
+        projectMeta.set_id(projectId);
         mongoClient.getDatabase(Util.DATABAST_NAME).getCollection(Util.COLLECTION_PROJECT_NAME)
-                .findOneAndReplace(Filters.eq(serviceId),projectMeta.toDocument());
+                .findOneAndReplace(Filters.eq(projectId),projectMeta.toDocument());
         return true;
     }
     @GetMapping("/deleteproject")
-    public boolean deleteProjectById(@RequestParam("id")String serviceId){
+    public boolean deleteProjectById(@RequestParam("id")String projectId){
         mongoClient.getDatabase(Util.DATABAST_NAME).getCollection(Util.COLLECTION_PROJECT_NAME)
-                .deleteOne(Filters.eq(serviceId));
+                .deleteOne(Filters.eq(projectId));
         return true;
     }
 }
