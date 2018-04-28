@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script type="application/javascript" src="js/jquery-3.3.1.js"></script>
+</head>
+<body>
+<div>
+    <div>
+        <input type="text" id="getFileId"/>
+        <input type="submit" id="getFileSub">
+        <script>
+            var urlPrefix = "http://localhost:8080/"
+            $("#getFileSub").on("click",function () {
+                var id = $("#getFileId").val();
+                $.ajax({
+                    url:urlPrefix + "file/" + id,
+                    method:"get",
+                    complete:function (data,status) {
+                        console.info("data",data)
+                        console.info("status",status)
+                    }
+                })
+            })
+        </script>
+    </div>
+    <a href="http://localhost:8080/file/67cc14e5-634d-4b8e-ad3c-2a2f5fd34a8e">下载</a>
+
+    <input type="button" value="更新文件" id="updateFile"/>
+    <script>
+        $("#updateFile").on("click",function () {
+            var data = {
+                name:"newname",
+                profile:"test profie"
+            }
+            $.ajax({
+                url:urlPrefix + "file/67cc14e5-634d-4b8e-ad3c-2a2f5fd34a8e" ,
+                method:"post",
+                data:data,
+                complete:function (data,status) {
+                    console.info("data",data)
+                    console.info("status",status)
+                }
+            })
+        })
+    </script>
+
+    <input type="text" id="deletetext">
+    <input type="button" value="删除文件" id="deletefile"/>
+    <script>
+        $("#deletefile").on("click",function () {
+
+            $.ajax({
+                url:urlPrefix + "deletefile?id=" + $("#deletetext").val() ,
+                method:"get",
+                complete:function (data,status) {
+                    console.info("data",data)
+                    console.info("status",status)
+                }
+            })
+        })
+    </script>
+
+</div>
+</body>
+</html>
