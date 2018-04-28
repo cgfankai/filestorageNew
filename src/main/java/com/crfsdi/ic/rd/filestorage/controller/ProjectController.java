@@ -28,7 +28,7 @@ public class ProjectController {
         return projectMetaMap.values();
     }
     @PostMapping("/project")
-    public String getAllProject(ProjectMeta projectMeta){
+    public String addProject(ProjectMeta projectMeta){
         try {
             mongoClient.getDatabase(Util.DATABAST_NAME)
                     .getCollection(Util.COLLECTION_PROJECT_NAME)

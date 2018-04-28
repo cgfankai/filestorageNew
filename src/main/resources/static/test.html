@@ -6,57 +6,144 @@
     <script type="application/javascript" src="js/jquery-3.3.1.js"></script>
 </head>
 <body>
+
 <div>
+    <script>
+        var urlPrefix = "http://localhost:8080/"
+
+        function getAllFiles() {
+            $.ajax({
+                url: urlPrefix + "file",
+                method: 'get',
+                success: function (data) {
+                    console.info("获取所有文件列表：", data)
+                }
+            })
+        }
+    </script>
+    <button onclick="getAllFiles()">获取文件列表</button>
+</div>
+<div>
+    <script>
+        function getAllServices() {
+            $.ajax({
+                url: urlPrefix + "service",
+                method: 'get',
+                success: function (data) {
+                    console.info("获取所有业务列表：", data)
+                }
+            })
+        }
+    </script>
+    <button onclick="getAllServices()">获取service列表</button>
+</div>
+<div>
+    <script>
+        function getAllProjects() {
+            $.ajax({
+                url: urlPrefix + "project",
+                method: 'get',
+                success: function (data) {
+                    console.info("获取所有项目列表：", data)
+                }
+            })
+        }
+    </script>
+    <button onclick="getAllProjects()">获取project列表</button>
+</div>
+
+<div>
+    <form method="post" action="/file" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <label> serviceId</label>
+        <input type="text" name="serviceId">
+        <label> projectId</label>
+        <input type="text" name="projectId">
+        <label> type</label>
+        <input type="text" name="type">
+        <input type="submit">
+    </form>
+
     <div>
-        <input type="text" id="getFileId"/>
-        <input type="submit" id="getFileSub">
+        <input type="text" id="getFilesId"/>
+        <input type="submit" id="getFileSub" value="指定ID获取文件信息">
         <script>
-            var urlPrefix = "http://localhost:8080/"
-            $("#getFileSub").on("click",function () {
-                var id = $("#getFileId").val();
+
+            $("#getFileSub").on("click", function () {
+                var id = $("#getFilesId").val();
                 $.ajax({
-                    url:urlPrefix + "file/" + id,
-                    method:"get",
-                    complete:function (data,status) {
-                        console.info("data",data)
-                        console.info("status",status)
+                    url: urlPrefix + "file/" + id,
+                    method: "get",
+                    complete: function (data, status) {
+                        console.info("data", data)
+                        console.info("status", status)
                     }
                 })
             })
         </script>
     </div>
-    <a href="http://localhost:8080/file/67cc14e5-634d-4b8e-ad3c-2a2f5fd34a8e">下载</a>
+    <div>
+        <input type="text" id="getfileid">
+        <input type="button" value="下载文件" id="downloadFile">
+        <script>
+            $("#downloadFile").click(function () {
+                var aLink = document.createElement('a');
+                aLink.href = urlPrefix + "file/" + $('#getfileid').val();
+                aLink.click();
+            });
+        </script>
+    </div>
 
-    <input type="button" value="更新文件" id="updateFile"/>
-    <script>
-        $("#updateFile").on("click",function () {
-            var data = {
-                name:"newname",
-                profile:"test profie"
-            }
-            $.ajax({
-                url:urlPrefix + "file/67cc14e5-634d-4b8e-ad3c-2a2f5fd34a8e" ,
-                method:"post",
-                data:data,
-                complete:function (data,status) {
-                    console.info("data",data)
-                    console.info("status",status)
+
+    <div>
+        <label>文件ID</label>
+        <input type="text" id="updateFileId">
+        <label>文件name</label>
+        <input type="text" id="updateFileName">
+        <label>文件类型</label>
+        <input type="text" id="updateFileType">
+        <label>业务id</label>
+        <input type="text" id="updateFileServiceId">
+        <label>项目ID</label>
+        <input type="text" id="updateFileProjectId">
+        <label>profile</label>
+        <input type="text" id="updateFileProfile">
+
+        <input type="button" value="更新文件" id="updateFile"/>
+        <script>
+            $("#updateFile").on("click", function () {
+                var data = {
+                    name:$("#updateFileName").val(),
+                    type: $("#updateFileType").val(),
+                    serviceId: $("#updateFileServiceId").val(),
+                    projectId: $("#updateFileProjectId").val(),
+                    profile: $("#updateFileProfile").val(),
                 }
+                $.ajax({
+                    url: urlPrefix + "file/" + $("#updateFileId").val(),
+                    method: "post",
+                    data: data,
+                    complete: function (data, status) {
+                        console.info("data", data)
+                        console.info("status", status)
+                    }
+                })
             })
-        })
-    </script>
+        </script>
+
+    </div>
 
     <input type="text" id="deletetext">
     <input type="button" value="删除文件" id="deletefile"/>
     <script>
-        $("#deletefile").on("click",function () {
+        $("#deletefile").on("click", function () {
 
             $.ajax({
-                url:urlPrefix + "deletefile?id=" + $("#deletetext").val() ,
-                method:"get",
-                complete:function (data,status) {
-                    console.info("data",data)
-                    console.info("status",status)
+                url: urlPrefix + "deletefile?id=" + $("#deletetext").val(),
+                method: "get",
+                complete: function (data, status) {
+                    console.info("data", data)
+                    console.info("status", status)
                 }
             })
         })
@@ -64,21 +151,41 @@
 
     <input type="button" value="搜索文件" id="searchfile"/>
     <script>
-        $("#searchfile").on("click",function () {
+        $("#searchfile").on("click", function () {
 
             $.ajax({
-                url:urlPrefix + "searchfile" ,
-                method:"post",
-                data:{
-                    _id:1111111
+                url: urlPrefix + "searchfile",
+                method: "post",
+                data: {
+                    _id: 1111111
                 },
-                complete:function (data,status) {
-                    console.info("data",data)
-                    console.info("status",status)
+                complete: function (data, status) {
+                    console.info("data", data)
+                    console.info("status", status)
                 }
             })
         })
     </script>
+
+    <div>
+        <form method="post" action="/service">
+            <label> service name</label>
+            <input type="text" name="name">
+            <label> service profile</label>
+            <input type="text" name="profile">
+            <input type="submit" value="增加新业务">
+        </form>
+    </div>
+
+    <div>
+        <form method="post" action="/project">
+            <label> project name</label>
+            <input type="text" name="name">
+            <label> project profile</label>
+            <input type="text" name="profile">
+            <input type="submit" value="增加新项目">
+        </form>
+    </div>
 
 </div>
 </body>

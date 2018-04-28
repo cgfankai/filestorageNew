@@ -59,7 +59,8 @@ public class FileController {
             , @RequestParam(value = "serviceId", required = false) String serviceId
             , @RequestParam(value = "projectId", required = false) String projectId
             , @RequestParam(value = "type", required = false) String type
-            , @RequestParam(value = "profile", required = false) String profile) {
+            , @RequestParam(value = "profile", required = false) String profile
+            , @RequestParam(value = "userId", required = false) String userId) {
         if (!file.isEmpty()) {
             FileMeta fileMeta = new FileMeta()
                     .setPath(Util.saveFile(file))
@@ -68,6 +69,7 @@ public class FileController {
                     .setProjectId(projectId)
                     .setDate(new Date())
                     .setProfile(profile)
+                    .setUserId(userId)
                     .setType(type);
             Document document = fileMeta.toDocument();
             LOG.info("文件meta{}", fileMeta);

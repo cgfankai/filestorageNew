@@ -28,7 +28,7 @@ public class ServiceController {
         return serviceMetaMap.values();
     }
     @PostMapping("/service")
-    public String getAllService(ServiceMeta serviceMetaInput){
+    public String addService(ServiceMeta serviceMetaInput){
         try {
             mongoClient.getDatabase(Util.DATABAST_NAME)
                     .getCollection(Util.COLLECTION_SERVICE_NAME)
