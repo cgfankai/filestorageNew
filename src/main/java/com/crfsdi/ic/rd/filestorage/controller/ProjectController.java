@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 public class ProjectController {
     private static Logger LOG = LoggerFactory.getLogger(ProjectController.class);
 

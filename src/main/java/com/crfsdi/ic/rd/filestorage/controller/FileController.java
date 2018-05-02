@@ -8,6 +8,7 @@ import com.crfsdi.ic.rd.filestorage.metaData.ServiceMeta;
 import com.crfsdi.ic.rd.filestorage.output.FileOutput;
 import com.mongodb.Block;
 import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
@@ -169,36 +170,42 @@ public class FileController {
             , @RequestParam(value = "projectId", required = false) String inputProjectId) {
         List<FileOutput> result = new LinkedList<>();
         Bson filters = null;
-        if (inputServiceId != null && inputProjectId != null) {
+        if (inputServiceId != null && !inputServiceId.isEmpty() && inputProjectId != null && !inputProjectId.isEmpty()) {
             filters = Filters.and(Filters.eq("serviceId", inputServiceId)
                     , Filters.eq("projectId", inputProjectId));
         }
-        if (inputServiceId == null && inputProjectId != null) {
+        if ( (inputServiceId == null || inputServiceId.isEmpty()) && inputProjectId != null && !inputProjectId.isEmpty()) {
             filters = Filters.eq("projectId", inputProjectId);
         }
-        if (inputServiceId != null && inputProjectId == null) {
+        if (inputServiceId != null && !inputServiceId.isEmpty() && (inputProjectId == null || inputProjectId.isEmpty())) {
             filters = Filters.eq("serviceId", inputServiceId);
         }
-        mongoClient.getDatabase(Util.DATABAST_NAME)
-                .getCollection(Util.COLLECTION_FILE_NAME)
-                .find(filters)
-                .forEach((Block<? super Document>) doc -> {
-                    FileOutput temp = new FileOutput(DocUtil.getThis(doc,FileMeta.class));
-                    if (temp.getServiceId() != null && serviceMetaMap.containsKey(temp.getServiceId())) {
-                        temp.setServiceName(serviceMetaMap.get(temp.getServiceId()).getName());
-                    }
-                    if (temp.getProjectId() != null && projectMetaMap.containsKey(temp.getProjectId())) {
-                        temp.setProjectName(projectMetaMap.get(temp.getProjectId()).getName());
-                    }
-                    if (inputName != null){
-                        if (temp.getName().contains(inputName)){
-                            result.add(temp);
-                        }
-                    }else {
-                        result.add(temp);
-                    }
-                });
-        LOG.info(result.toString());
+        FindIterable<Document> iterable = null;
+        if ((inputServiceId == null || inputServiceId.isEmpty()) && (inputProjectId == null || inputProjectId.isEmpty())) {
+            iterable = mongoClient.getDatabase(Util.DATABAST_NAME)
+                    .getCollection(Util.COLLECTION_FILE_NAME)
+                    .find();
+        } else {
+            iterable = mongoClient.getDatabase(Util.DATABAST_NAME)
+                    .getCollection(Util.COLLECTION_FILE_NAME)
+                    .find(filters);
+        }
+        iterable.forEach((Block<? super Document>) doc -> {
+            FileOutput temp = new FileOutput(DocUtil.getThis(doc, FileMeta.class));
+            if (temp.getServiceId() != null && serviceMetaMap.containsKey(temp.getServiceId())) {
+                temp.setServiceName(serviceMetaMap.get(temp.getServiceId()).getName());
+            }
+            if (temp.getProjectId() != null && projectMetaMap.containsKey(temp.getProjectId())) {
+                temp.setProjectName(projectMetaMap.get(temp.getProjectId()).getName());
+            }
+            if (inputName != null) {
+                if (temp.getName().contains(inputName)) {
+                    result.add(temp);
+                }
+            } else {
+                result.add(temp);
+            }
+        });
         return result;
     }
 
